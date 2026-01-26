@@ -25,7 +25,7 @@ def generate_launch_description():
                 name='camera_explorer',
                 parameters=[
                     {'camera_name': 'camera_explorer'},
-                    {'video_device': '/dev/video4'},
+                    {'video_device': '/dev/video2'},
                     {'camera_info_url': usb_cam_info_url},
                     {'frame_id': 'camera_explorer'}
                 ],

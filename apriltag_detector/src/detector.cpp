@@ -14,10 +14,10 @@ namespace vision_tools
     this->declare_parameter("max_hamming_distance", 1);
 
     camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>(
-        "/camera_info", 10,
+        "/camera/color/camera_info", 10,
         std::bind(&AprilTagDetector::cameraInfoCallback, this, std::placeholders::_1));
     image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/image_raw", 10, std::bind(&AprilTagDetector::imageCallback, this, std::placeholders::_1));
+        "/camera/color/image_raw", 10, std::bind(&AprilTagDetector::imageCallback, this, std::placeholders::_1));
 
     tag_publisher_ =
         this->create_publisher<extender_msgs::msg::SharedControlGoalArray>("/tag_detections", 10);
