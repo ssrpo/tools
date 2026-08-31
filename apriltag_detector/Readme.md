@@ -62,7 +62,7 @@ ros2 launch apriltag_detector explorer_camera_detection.launch.py
 ```
 
 This will:
-1. Start the USB camera node (configured for `/dev/video0` with calibration from `explorer_camera_calib.yaml`)
+1. Start the USB camera node (configured for `/dev/video2` with calibration from `explorer_camera_calib.yaml`)
 2. Start the AprilTag detector node
 3. Start the AprilTag bridge node for pose transformation
 
@@ -124,6 +124,29 @@ Parameters:
 
 - `/tag_detections` (extender_msgs/SharedControlGoalArray): Array of detected tags with their 3D poses (detector node)
 - `/shared_control/dynamic_goals` (extender_msgs/SharedControlGoalArray): Array of detected tags transformed to target frame (bridge node)
+
+## Visual Servoing Integration
+
+Robin's current `visual_servoing` node consumes the detector output directly:
+
+| Topic | Message | Producer / consumer |
+| --- | --- | --- |
+| `/image_raw` | `sensor_msgs/msg/Image` | Camera node -> AprilTag detector |
+| `/camera_info` | `sensor_msgs/msg/CameraInfo` | Camera node -> AprilTag detector |
+| `/tag_detections` | `extender_msgs/msg/SharedControlGoalArray` | AprilTag detector -> visual servoing |
+| `/visual_servoing/velocity_command` | `geometry_msgs/msg/TwistStamped` | visual servoing -> UI monitor |
+| `/visual_servoing/error_TAGtoTAGd` | `geometry_msgs/msg/TwistStamped` | visual servoing -> UI monitor |
+
+The UI Topic Monitor should subscribe only to small diagnostic messages such as
+`/tag_detections`, `/visual_servoing/velocity_command`, and
+`/visual_servoing/error_TAGtoTAGd`. Do not monitor `/image_raw` or compressed image
+topics there; use the webcam/video stream widget for visual feedback.
+
+If the browser webcam preview is fluid but the ROS image pipeline makes AprilTag
+processing too slow, the bottleneck is likely in the ROS camera/image transport path.
+In that case, reading the camera directly inside the AprilTag detector node is a
+reasonable temporary architecture, as long as the detector still publishes
+`/tag_detections` with the same `SharedControlGoalArray` contract.
 
 ## Message Structure
 
